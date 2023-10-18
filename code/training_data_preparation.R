@@ -3,7 +3,8 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 #load packages
 pkgs <- c(
-  "tidyverse"
+  "tidyverse",
+  "caret"
 )
 lapply(pkgs, library, character.only=TRUE)
 
@@ -39,6 +40,9 @@ for (rep in 1:reps){
   for(N_feature in N_features) {
     for(N_row in N_rows){
       
+      # N_feature = 10
+      # N_row = 1000
+      
       # Derive Row Indices -------------------------------------------------------
       
       index_0 <- which(CRIT_diabetes_binary == 0)
@@ -61,6 +65,22 @@ for (rep in 1:reps){
       anonymized_crit_reduced <- CRIT_diabetes_binary_anon[balanced_sampled_indices, ]
       anonymized_pred_reduced <- PRED_diabetes_binary_anon[balanced_sampled_indices, sampled_col_indices]
       
+      class(original_pred_reduced)
+      lapply(anonymized_pred_reduced, class)
+      
+      # One hot encode -----------------------------------------------------------
+      
+      string_columns <- sapply(anonymized_pred_reduced, is.character)
+      string_columns <- names(string_columns[string_columns])
+      
+      numeric_data <- anonymized_pred_reduced[setdiff(names(anonymized_pred_reduced), string_columns)]
+      
+      dummy_data <- dummyVars(formula = ~ ., data = anonymized_pred_reduced[, string_columns], fullRank = TRUE)
+      dummy_data <- data.frame(predict(dummy_data, newdata = anonymized_pred_reduced))
+      
+      # Combine the numeric data with the one-hot encoded data
+      anonymized_pred_reduced <- cbind(numeric_data, dummy_data)
+
       # Save Data to Corresponding Folder ----------------------------------------
       
       folder_name_original <- paste0(N_row,"r_",N_feature,"f")

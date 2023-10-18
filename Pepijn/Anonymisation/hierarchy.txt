@@ -1,6 +1,1 @@
-school,hierarchy_student/school.csv,
-traveltime,hierarchy_student/traveltime.csv,
-failures,hierarchy_student/failures.csv,
-higher,hierarchy_student/higher.csv,
-famrel,hierarchy_student/famrel.csv,
-G3,Insensitive,
+age,Quasi_identifying,Decimal,arithmic_mean type_employer,Quasi_identifying,Decimal,arithmic_mean education,Quasi_identifying,Decimal,arithmic_mean marital,Quasi_identifying,Decimal,arithmic_mean occupation,Quasi_identifying,Decimal,arithmic_mean relationship,Quasi_identifying,Decimal,arithmic_mean race,Quasi_identifying,Decimal,arithmic_mean sex,Quasi_identifying,NaN,arithmic_mean capital_gain,Quasi_identifying,Decimal,arithmic_mean capital_loss,Quasi_identifying,Decimal,arithmic_mean hr_per_week,Quasi_identifying,Decimal,arithmic_mean country,Quasi_identifying,Decimal,arithmic_mean income,Insensitive,NaN,NaN

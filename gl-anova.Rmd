@@ -1,0 +1,121 @@
+---
+title: "gl-anova"
+output: html_document
+date: "2023-10-23"
+---
+
+
+```{r}
+library('tidyverse')
+library('ggpubr')
+library('rstatix')
+library('ARTool')
+library('rcompanion')
+```
+
+
+```{r}
+#data_frame <- read.csv("C:/Users/Vit/Desktop/gl-r/ready-rf.csv")
+data_frame <- read.csv("C:/Users/Vit/Desktop/gl-r/ready-knn.csv")
+head(data_frame)
+```
+
+```{r}
+data_frame %>%
+  group_by(dataset, rows, features) %>%
+  get_summary_stats(joules, type = "mean_sd")
+```
+
+```{r}
+bxp <- ggboxplot(
+  data_frame, x = "dataset", y = "joules",
+  color = "rows", palette = "jco",
+  facet.by = "features", short.panel.labs = FALSE
+  )
+bxp
+```
+
+```{r}
+data_frame %>%
+  group_by(features, dataset, rows) %>%
+  identify_outliers(joules)
+```
+
+```{r}
+data_frame <- data_frame %>%
+  mutate(sqrt_joules = 1/joules)
+data_frame %>%
+  group_by(features, dataset, rows) %>%
+  shapiro_test(sqrt_joules)
+```
+
+```{r}
+ggqqplot(data_frame, "joules", ggtheme = theme_bw()) +
+  facet_grid(features + dataset ~ rows, labeller = "label_both")
+```
+
+```{r}
+data_frame %>%
+  group_by(features, rows) %>%
+  levene_test(joules ~ dataset)
+```
+
+```{r}
+#res.aov <- anova_test(
+#  data = data_frame, dv = joules, wid = id,
+#  between = dataset, within = c(features, rows)
+#  )
+#get_anova_table(res.aov)
+```
+
+```{r}
+res.aov <- aov(joules ~ dataset + features + rows, data = data_frame)
+summary(res.aov)
+```
+
+```{r}
+cohens_f(res.aov)
+```
+
+```{r}
+#m <- art(joules ~ factor(features) * factor(dataset) * factor(rows), data=data_frame)
+#anova(m)
+```
+
+```{r}
+#library('effsize')
+#cohen.d(joules, d=data_frame)
+```
+
+```{r}
+#efsize_df <- rstatix::kruskal_effsize(joules ~ exp, data=data_frame)
+#efsize_df
+
+#data_frame %>%
+#  group_by(features, dataset, rows) %>%
+#  kruskal_effsize(joules ~ data_frame)
+```
+
+```{r}
+ggplot(data_frame, aes(x = exp, y = joules)) + stat_summary(fun = mean, geom = "bar") + coord_flip()
+```
+
+```{r}
+ggplot(data_frame, aes(x = joules, fill = exp)) + geom_density(alpha = 0.5)
+```
+
+```{r, fig.height=12}
+violin <- ggplot(data_frame, aes(x=exp, y=joules, fill=exp)) +
+          geom_violin(trim=FALSE, alpha = 0.8) + # alpha for the opacity
+          geom_boxplot(width=0.2, fill="white", outlier.size = 0.2) +
+          stat_summary(fun = mean, geom = "point", shape = 1, size = 2) +
+          labs(title="Violin Plot with Inner Boxplot",
+          x="Experiment",
+          y="Joule Calculated") + coord_flip()
+violin
+```
+
+
+
+
+
